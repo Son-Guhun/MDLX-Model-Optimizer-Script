@@ -7,9 +7,10 @@ Compatible with Pyton 2.7 and 3.x
 
 Instructions:
 
-Use the .bat files to optimizer your models. Simply drag the model file to the .bat file and it will be converted as "filename-opt.mdx/mdl"
+To optimize a model, simply drag it into the Optimizer.exe file. If the file is an MDX file, it will automaticlly be converted
+to MDL using MDLXConv version 1.04 and then converted back into MDX once it has been fully optimized.
 
-Currently, linearizing the animations is the only optimization that will be made to the model. Use other tools for other optimizations.
+Optimized file swill be named: "filename-opt.mdl" or "filename-opt.mdx".
 /////////////////////////////
 
 

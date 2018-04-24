@@ -1,61 +1,96 @@
-class Optimizer:
-    fileLines = []
-    index = 0
+import sys
+import subprocess
+import os
+import time
 
-    sourceName = ""
+from py2exeUtils import scriptDir as SCRIPT_PATH
+from py2exeUtils import ConvertPath
+
+class Model:
+    mdlx_path = SCRIPT_PATH+"mdlxconv/MdlxConv_1.04.exe" \
+                if os.path.exists(SCRIPT_PATH+'mdlxconv') \
+                else ConvertPath(SCRIPT_PATH, direcotiresUntil = 1)+'mdlxconv/MdlxConv_1.04.exe'
+
 
     lineTypes = ["Hermite", "Bezier"]
     tanTypes = ["InTan", "OutTan"]
 
-    def __init__(self,fileName):
-        with open(fileName, "r") as f:
-            self.fileLines = f.readlines()
-        self.sourceName = fileName
+    def __init__(self,file_name):
+        if ".mdx" == file_name[-4:]:
+            subprocess.call([Model.mdlx_path, file_name])
+            file_name = file_name[:-4] + '.mdl'
+            self.is_mdx = True
+        elif ".mdl" == file_name[-4:]:
+            self.is_mdx = False
+        else:
+            raise ValueError('File is not an mdx or mdl file')
+            
+        with open(file_name, "r") as f:
+            self._file_lines = f.readlines()
+        self.sourceName = file_name
+        self._index = 0
+        
+        if self.is_mdx:
+            os.remove(file_name)
 
-    def LinearizeLineType(self,typeName):
-        stringList = self.fileLines
-        index = self.index
+    def _linearize_line_type(self,typeName):
+        stringList = self._file_lines
+        index = self._index
         stringList[index] =  stringList[index].replace(typeName, "Linear")
         
-    def LinearizeTan(self):
-        del self.fileLines[self.index]
-        self.index -= 1
+    def _linearize_tan(self):
+        del self._file_lines[self._index]
+        self._index -= 1
 
-    def LinearizeAnimations(self):
-        while self.index < len(self.fileLines):
-            line = self.fileLines[self.index]
+    def linearize_animations(self):
+        while self._index < len(self._file_lines):
+            line = self._file_lines[self._index]
             
-            for lineType in Optimizer.lineTypes:
+            for lineType in Model.lineTypes:
                 if lineType in line:
-                    self.LinearizeLineType(lineType)
+                    self._linearize_line_type(lineType)
                     break
-            for tanType in Optimizer.tanTypes:
+            for tanType in Model.tanTypes:
                 if tanType in line:
-                    self.LinearizeTan()
+                    self._linearize_tan()
                     break
 
-            self.index += 1
-            if self.index%100 == 0:
-                print ( "Line", self.index, "of",len(self.fileLines) )
+            self._index += 1
+            if self._index%100 == 0:
+                print ( "Line", self._index, "of",len(self._file_lines) )
 
-    def WriteToFile(self,fileName = ""):
-        if fileName == "":
-            fileName = self.sourceName.replace(".mdl", "-opt.mdl")
-        with open(fileName, "w") as f:
-            f.writelines(self.fileLines)
+    def write_to_file(self,file_name = ""):
+        if file_name == "":
+            file_name = self.sourceName.replace(".mdl", "-opt.mdl")
+        with open(file_name, "w") as f:
+            f.writelines(self._file_lines)
+        if self.is_mdx:
+            subprocess.call([Model.mdlx_path, file_name])
+            os.remove(file_name)
+        return file_name
 
-import sys
-if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        if ".mdl" in sys.argv[1]:
-            a = Optimizer(sys.argv[1])
-            a.LinearizeAnimations()
-            a.WriteToFile()
+print SCRIPT_PATH
+
+try:
+    if __name__ == "__main__":
+        if len(sys.argv) == 2:
+            file_name = sys.argv[1]
+            print file_name
+            try:
+                a = Model(file_name)
+            except ValueError as error:
+                print error.message
+                while True:
+                    time.sleep(1)
+            a.linearize_animations()
+            file_name = a.write_to_file()
             print ("Done!")
         else:
-            print ("\""+sys.argv[1]+"\"","is not a .mdl file.")
             while True:
-                pass
-            
-
-    
+                time.sleep(1)
+                print sys.argv
+except Exception as error:
+    while True:
+        time.sleep(1)
+        print error
+        print sys.argv
