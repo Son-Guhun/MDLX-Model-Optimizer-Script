@@ -3,13 +3,13 @@ import subprocess
 import os
 import time
 
-from py2exeUtils import scriptDir as SCRIPT_PATH
-from py2exeUtils import ConvertPath
+from py2exeUtils import DIRECTORY
+from py2exeUtils import path
 
 class Model:
-    mdlx_path = SCRIPT_PATH+"mdlxconv/MdlxConv_1.04.exe" \
-                if os.path.exists(SCRIPT_PATH+'mdlxconv') \
-                else ConvertPath(SCRIPT_PATH, direcotiresUntil = 1)+'mdlxconv/MdlxConv_1.04.exe'
+    mdlx_path = DIRECTORY+"mdlxconv\\converter.exe" \
+                if os.path.exists(DIRECTORY+'mdlxconv') \
+                else path.up(DIRECTORY)+'mdlxconv\\converter.exe'
 
 
     lineTypes = ["Hermite", "Bezier"]
@@ -69,22 +69,22 @@ class Model:
             os.remove(file_name)
         return file_name
 
-print SCRIPT_PATH
+print DIRECTORY
 
 try:
     if __name__ == "__main__":
-        if len(sys.argv) == 2:
-            file_name = sys.argv[1]
-            print file_name
-            try:
-                a = Model(file_name)
-            except ValueError as error:
-                print error.message
-                while True:
-                    time.sleep(1)
-            a.linearize_animations()
-            file_name = a.write_to_file()
-            print ("Done!")
+        if len(sys.argv) >= 2:
+            for file_name in sys.argv[1:]:
+                print file_name
+                try:
+                    a = Model(file_name)
+                except ValueError as error:
+                    print error.message
+                    while True:
+                        time.sleep(1)
+                a.linearize_animations()
+                file_name = a.write_to_file()
+                print ("Done!")
         else:
             while True:
                 time.sleep(1)

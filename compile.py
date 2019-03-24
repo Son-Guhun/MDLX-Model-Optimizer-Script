@@ -17,7 +17,7 @@ a= Compiler(
         'readme.txt'
     ],
     [
-        'mdlxconv/MdlxConv_1.04.exe'
+        'mdlxconv/converter.exe'
     ]
 )
 a.changeFolderNames('Optimizer')
