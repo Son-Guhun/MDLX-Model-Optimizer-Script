@@ -1,1 +1,0 @@
-python Converter.py %1 -i
