@@ -14,10 +14,10 @@ a= Compiler(
         'compile.py',
         'setup.py',
         #Text Files
-        'readme.txt'
+        'README.md'
     ],
     [
-        'mdlxconv/converter.exe'
+        'mdlxconv\\converter.exe'
     ]
 )
 a.changeFolderNames('Optimizer')
